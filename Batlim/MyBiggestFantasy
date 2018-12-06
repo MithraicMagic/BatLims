@@ -1,0 +1,38 @@
+Tasks:
+
+	Erwin:
+	- Achtergrond velden
+	- Effect geluid
+	- Splashscreen contents (UI)
+
+	Nick:
+	- Tank design
+	- HTML achtergrond (Game en Splash screen)
+	- Effecten
+	- UI Gamescreen
+
+
+Stats:
+
+	Splashscreen:
+	- Amount of ongoing games
+	- Amount of played games
+	- Info button
+	- Play button
+	- Sound button
+
+	During loading/setup:
+	- Enemy field grayed out while waiting for other player
+	- Ready button
+	- Ships (movable, rotation allowed (Press a button))
+	- Ready indicator (Cross or Check)
+	- 4 Standard tanks, 1 modifyable
+
+	Gamescreen:
+	- Remaining tanks (P1 and P2, status: live/destroyed)
+	- Upgrades:
+		- Airstrike
+		- Move (into non-shot land)
+		- Spy plane
+	- Shot indicator (Explosion, miss = crater, hit = fire)
+	- 
