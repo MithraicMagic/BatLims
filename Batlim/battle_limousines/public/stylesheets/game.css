@@ -1,0 +1,62 @@
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+#garage {
+    width: 500px;
+    height: 700px;
+    float: left;
+    position: relative;
+}
+
+.limousine {
+    height: 96px;
+    background-color: tomato;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+    padding: 0px;
+    position: relative;
+}
+
+#board {
+    border-style: solid;
+    border-width: 3px;
+    position: relative;
+    width: 800px;
+    height: 800px;
+    margin:0px;
+    float: left;
+}
+
+.tile {
+    border-style: solid;
+    border-width: 3px;
+    border-color: black;
+    width: 94px;
+    height: 94px;
+    background-color: white;
+    padding: 0px;
+    float: left;
+    position: relative;
+}
+
+#start {
+    width: 500px;
+    height: 106px;
+    float: left;
+    position: relative;
+}
+
+main {
+    width: 1406px;
+    height: 880px;
+}
+
+#left {
+    width: 500px;
+    height: 800px;
+    margin-right: 100px;
+    float: left;
+}

@@ -38,6 +38,22 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-console.log("big boobies")
+var server = http.createServer(app);
+const wss = new WebSocket.Server({ server })
+
+var websockets = {};
+
+setInterval(function() {
+  for(let i in websockets){
+      if(websockets.hasOwnProperty(i)){
+          let gameObj = websockets[i];
+          //if the gameObj has a final status, the game is complete/aborted
+          if(gameObj.finalStatus!=null){
+              console.log("\tDeleting element "+i);
+              delete websockets[i];
+          }
+      }
+  }
+}, 50000);
 
 module.exports = app;
