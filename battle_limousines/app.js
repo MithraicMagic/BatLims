@@ -33,7 +33,7 @@ app.use(function(err, req, res, next) {
 });
 
 var port = process.argv[2];
-var server = http.createServer(app).listen(port);
+http.createServer(app).listen(port);
 
 app.use(express.static(__dirname + "/public"));
 
