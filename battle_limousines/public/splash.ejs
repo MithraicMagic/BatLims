@@ -3,6 +3,7 @@
 
 <head>
 	<title>Magikarp</title>
+	<link rel="stylesheet" stype="text/css" href="stylesheets/splash.css"/>
 </head>
 
 <body>
@@ -11,10 +12,14 @@
 			<h1 align="middle">Battle Limousines</h1>
 		</div>
 		<div class="item2">
-			<p>Start</p>
-			<p>Help</p>
-			<p align="right">Active games: x</p>
-			<p align="right">Started games: y</p>
+			<h2>Start</h2>
+			<h2>Help</h2>
+			<h3 align="right">Started games:
+				<%= gamesStarted %>
+			</h3>
+			<h3 align="right">Finished games:
+				<%= gamesFinished %>
+			</h3>
 		</div>
 		<div class="item5" align="middle">Animation</div>
 	</div>

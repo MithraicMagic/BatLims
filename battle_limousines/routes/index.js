@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var gameStats = require("../stats.js");
 
 //Getting the homepage
 router.get('/', function(req, res) {
-    res.sendFile('splash.html', { root: "./public" });
+    res.render(__dirname + '/../public/splash.ejs', { gamesStarted: gameStats.started, gamesFinished: gameStats.finished});
 });
 
 //Getting the game page when pressing the start button
