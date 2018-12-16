@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var app = require("../app.js");
 var gameStats = require("../stats.js");
 
 //Getting the homepage
 router.get('/', function(req, res) {
-    res.render(__dirname + '/../public/splash.ejs', { gamesStarted: gameStats.started, gamesFinished: gameStats.finished});
+    res.render(__dirname + '/../public/splash.ejs', { connectionID : app.connectionID, gamesStarted: gameStats.started, gamesFinished: gameStats.finished});
 });
 
 //Getting the game page when pressing the start button

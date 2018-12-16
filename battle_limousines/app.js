@@ -6,6 +6,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var app = express();
+var websocket = require("ws");
 var url = require("url");
 var http = require("http");
 // view engine setup
@@ -32,9 +33,22 @@ app.use(function(err, req, res, next) {
     res.render('error');
 });
 
-var port = process.argv[2];
-http.createServer(app).listen(port);
-
 app.use(express.static(__dirname + "/public"));
+
+var port = process.argv[2];
+var server = http.createServer(app).listen(port);
+
+const wss = new websocket.Server ({server});
+var websockets = {};
+
+var currentGame = new Game(gameStats.started++);
+var connectionID = 0;
+
+wss.on("connection", function connection(ws) {
+    let con = ws;
+    con.id = connectionID++;
+    let playerType = currentGame.addPlayer(con);
+    websockets[con.id] = currentGame;
+});
 
 module.exports = app;
