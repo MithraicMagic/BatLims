@@ -1,4 +1,8 @@
 p, h1, h2, h3 {
     text-align: center;
-    color: tomato;
+    color: #4DA4A8;
+}
+
+body {
+    background-color: #212121;
 }
