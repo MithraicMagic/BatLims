@@ -32,7 +32,7 @@ game.prototype.addPlayer = function (player) {
 };
 
 game.prototype.setLocations = function (player, list) {
-    if (player === this.playerOne) {
+    if (player === 1) {
         this.battleShipsOne = list;
     } else {
         this.battleShipsTwo = list;
@@ -40,8 +40,8 @@ game.prototype.setLocations = function (player, list) {
 };
 
 game.prototype.checkHit = function (firingP, shot) {
-    return "hit";
     if (firingP === 1) {
+        console.log(this.battleShipsTwo);
         for (let i = 0; i < 21; i++) {
             if (this.battleShipsTwo[i] === shot) {
                 return "Hit";
@@ -49,6 +49,7 @@ game.prototype.checkHit = function (firingP, shot) {
         }
         return "Miss";
     } else {
+        console.log(this.battleShipsOne);
         for (var i = 0; i < 21; i++) {
             if (this.battleShipsOne[i] === shot) {
                 return "Hit";
@@ -56,10 +57,6 @@ game.prototype.checkHit = function (firingP, shot) {
         }
         return "Miss";
     }
-};
-
-game.prototype.checkHit = function(player, p) {
-
 };
 
 module.exports = game;

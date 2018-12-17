@@ -28,8 +28,6 @@ wss.on("connection", function(ws) {
     let player = game.addPlayer(con);
     websockets[con.id] = game;
 
-    console.log(game.checkHit());
-
     console.log("Player %s placed in game %s", ws.id, game.id);
 
     if (game.twoConnected()) {
@@ -50,20 +48,30 @@ wss.on("connection", function(ws) {
         let isPlayerOne = (game.playerOne === con);
         let jMsg = JSON.parse(message);
 
-        if (jMsg.type === messages.SET_LOCS); {
-            game.setLocations(con, jMsg.data);
-            console.log(game.battleShipsOne);
+        if (jMsg.type === messages.SET_LOCS) {
+            if (isPlayerOne) {
+                game.setLocations(1, jMsg.data);
+            } else {
+                game.setLocations(2, jMsg.data);
+            }
         }
 
         if (isPlayerOne) {
             if (jMsg.type === messages.SHOT_FIRED) {
-                console.log(game.checkHit(1, jMsg.data));
-                messages.HIT_OR_MISS_D.data = "Hit";
+                check = game.checkHit(1, jMsg.data);
+                messages.HIT_OR_MISS_D.data = check;
                 con.send(JSON.stringify(messages.HIT_OR_MISS_D));
+                game.playerTwo.send(JSON.stringify(messages.ATTACKER));
             }
         } else {
             if (jMsg.data === "READY") {
                 game.playerOne.send(JSON.stringify(messages.PLAYER_ONE));
+            }
+            if (jMsg.type === messages.SHOT_FIRED) {
+                check = game.checkHit(2, jMsg.data);
+                messages.HIT_OR_MISS_D.data = check;
+                con.send(JSON.stringify(messages.HIT_OR_MISS_D));
+                game.playerOne.send(JSON.stringify(messages.ATTACKER));
             }
         }
     });

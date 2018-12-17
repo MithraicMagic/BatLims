@@ -1,20 +1,19 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var app = require("../app.js");
 var gameStats = require("../stats.js");
 
 //Getting the homepage
-router.get('/', function(req, res) {
-    res.render(__dirname + '/../public/splash.ejs', { connectionID : app.connectionID, gamesStarted: gameStats.started, gamesFinished: gameStats.finished});
+router.get("/", function(req, res) {
+    var path = __dirname + '/../public/splash.ejs';
+    res.render(path, {gamesFinished : gameStats.finished, gamesStarted : gameStats.started});
 });
 
-//Getting the game page when pressing the start button
-router.get('/play', function(req, res) {
+router.get("/play", function(req, res) {
     res.sendFile('game.html', { root: "./public"});
 });
 
 router.get('/*', function(req, res) {
     res.sendFile('error.html', { root: "./public"});
-})
+});
 
 module.exports = router;

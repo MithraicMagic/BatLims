@@ -73,6 +73,7 @@ body {
     text-align: center;
     line-height: 125px;
     color: white;
+    display: block;
 }
 
 #start h2:hover{
@@ -89,4 +90,24 @@ body {
 
 #boards {
     padding-right: 50px;
+}
+
+#overlay {
+    position: fixed;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index:2;
+    background-color: rgba(0,0,0,0.5);
+}
+
+#overlay p {
+    font-size: 50px;
+    text-align: center;
+    color: white;
+    padding: 100px;
 }

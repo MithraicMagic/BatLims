@@ -1,15 +1,65 @@
+var socket = new WebSocket("ws://localhost:3000");
+var attacker = false;
+var shot = false;
+
+socket.onopen = function(){
+    socket.send("{}");
+};
+
+socket.onmessage = function(event) {
+    message = JSON.parse(event.data);
+    console.log(message.data);
+    console.log(event.data);
+
+    if (message.data === "ATTACK") {
+        console.log("Lol atekker");
+        attacker = true;
+    }
+
+    if (message.type == Messages.HIT_OR_MISS && shot) {
+        if (message.data == "Hit") {
+            console.log("HIT!");
+        } else if (message.data == "Miss") {
+            console.log("Miss...");
+        }
+    }
+
+    if (message.data === "player2") {
+        document.getElementById("overlayText").innerHTML = "Player 1 is ready!";
+        socket.send(JSON.stringify(Messages.READY));
+        setTimeout(function () {
+            olOff();
+        }, 2000);
+    } else if (message.data === "player1") {
+        document.getElementById("overlayText").innerHTML = "Player 2 is ready!";
+        setTimeout(function () {
+            olOff();
+        }, 2000);
+    }
+
+};
+
+function olOff() {
+    document.getElementById("overlay").style.display = "none";
+}
+
 function main() {
     for(var i = 1; i <= 64; i++){
         $("#board").append('<div class="tile '+ i +'"></div>');
         $("#eBoard").append('<div class="tile '+ i +'"></div>');
     }
 
-    $("#eBoard").on("click", function click(event){
-        var boardpos = $("#eBoard").offset();
-        var x = Math.ceil((event.pageX - boardpos.left)/70);
-        var y = Math.ceil((event.pageY - boardpos.top)/70);
-        var tile = ((y-1)*8)+x;
-        console.log("tile: " + tile);
+    $("#eBoard").on("click", function click(event) {
+        if (attacker) {
+            var boardpos = $("#eBoard").offset();
+            var x = Math.ceil((event.pageX - boardpos.left) / 70);
+            var y = Math.ceil((event.pageY - boardpos.top) / 70);
+            var tile = ((y - 1) * 8) + x;
+            Messages.SHOT_FIRED_LOC.data = tile;
+            socket.send(JSON.stringify(Messages.SHOT_FIRED_LOC));
+            attacker = false;
+            shot = true;
+        }
     });
 
     for(var i = 1; i <= 6; i++){
@@ -71,7 +121,14 @@ function main() {
             }
         }
         if(checkunique(tiles) == false) return;
-        console.log(tiles);
+        Messages.SET_LOCS_D.data = tiles;
+        socket.send(JSON.stringify(Messages.SET_LOCS_D));
+        //Disabling start button and disabling dragging of the limousines
+        for (var i = 1; i < 7; i++) {
+            document.getElementById("limousine"+i).removeAttribute("draggable");
+            document.getElementById("limousine"+i).removeAttribute("ondragstart");
+        }
+        document.getElementById("start").style.display = "none";
     });
 }
 $(document).ready(main);
