@@ -1,54 +1,77 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var app = express();
-var websocket = require("ws");
-var url = require("url");
+var express = require("express");
 var http = require("http");
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    next(createError(404));
-});
-// error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
-});
+var port = process.argv[2];
+var app = express();
+var messages = require("./public/javascripts/messages");
+var Game = require("./game.js");
+var websocket = require("ws");
+
+var gameStats = require("./stats.js");
 
 app.use(express.static(__dirname + "/public"));
+var server = http.createServer(app);
 
-var port = process.argv[2];
-var server = http.createServer(app).listen(port);
+var indexRouter = require("./routes/index");
+app.use(indexRouter);
 
-const wss = new websocket.Server ({server});
+const wss = new websocket.Server({ server });
 var websockets = {};
 
-var currentGame = new Game(gameStats.started++);
+var game = new Game(gameStats.started++);
 var connectionID = 0;
 
-wss.on("connection", function connection(ws) {
+wss.on("connection", function(ws) {
+
     let con = ws;
     con.id = connectionID++;
-    let playerType = currentGame.addPlayer(con);
-    websockets[con.id] = currentGame;
+    console.log("Player " + con.id + " has connected");
+    let player = game.addPlayer(con);
+    websockets[con.id] = game;
+
+    console.log(game.checkHit());
+
+    console.log("Player %s placed in game %s", ws.id, game.id);
+
+    if (game.twoConnected()) {
+        setTimeout(function() {
+            ws.send(JSON.stringify(messages.PLAYER_TWO));
+        }, 1000);
+        game = new Game(gameStats.started++);
+    }
+
+    if (con == game.playerOne) {
+        con.send(JSON.stringify(messages.ATTACKER));
+    }
+
+    con.on("message", function incoming(message) {
+        console.log(message);
+        let game = websockets[con.id];
+
+        let isPlayerOne = (game.playerOne === con);
+        let jMsg = JSON.parse(message);
+
+        if (jMsg.type === messages.SET_LOCS); {
+            game.setLocations(con, jMsg.data);
+            console.log(game.battleShipsOne);
+        }
+
+        if (isPlayerOne) {
+            if (jMsg.type === messages.SHOT_FIRED) {
+                console.log(game.checkHit(1, jMsg.data));
+                messages.HIT_OR_MISS_D.data = "Hit";
+                con.send(JSON.stringify(messages.HIT_OR_MISS_D));
+            }
+        } else {
+            if (jMsg.data === "READY") {
+                game.playerOne.send(JSON.stringify(messages.PLAYER_ONE));
+            }
+        }
+    });
+});
+
+
+server.listen(port, function() {
+    console.log("Listening on port: " + port);
 });
 
 module.exports = app;
