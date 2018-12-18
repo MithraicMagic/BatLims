@@ -39,6 +39,7 @@ wss.on("connection", function(ws) {
 
     if (con == game.playerOne) {
         con.send(JSON.stringify(messages.ATTACKER));
+        gameStats.started_visible++;
     }
 
     con.on("message", function incoming(message) {
@@ -51,27 +52,37 @@ wss.on("connection", function(ws) {
         if (jMsg.type === messages.SET_LOCS) {
             if (isPlayerOne) {
                 game.setLocations(1, jMsg.data);
+                game.playerTwo.send(JSON.stringify(messages.TILES_SET));
             } else {
                 game.setLocations(2, jMsg.data);
+                game.playerOne.send(JSON.stringify(messages.TILES_SET));
             }
         }
 
         if (isPlayerOne) {
             if (jMsg.type === messages.SHOT_FIRED) {
-                check = game.checkHit(1, jMsg.data);
-                messages.HIT_OR_MISS_D.data = check;
+                messages.HIT_OR_MISS_D.data = game.checkHit(1, jMsg.data);
                 con.send(JSON.stringify(messages.HIT_OR_MISS_D));
                 game.playerTwo.send(JSON.stringify(messages.ATTACKER));
+            }
+            if (jMsg.data === "I_WON") {
+                game.playerTwo.send(JSON.stringify(messages.YOU_LOST));
+                game.playerTwo.close();
+                con.close();
             }
         } else {
             if (jMsg.data === "READY") {
                 game.playerOne.send(JSON.stringify(messages.PLAYER_ONE));
             }
             if (jMsg.type === messages.SHOT_FIRED) {
-                check = game.checkHit(2, jMsg.data);
-                messages.HIT_OR_MISS_D.data = check;
+                messages.HIT_OR_MISS_D.data = game.checkHit(2, jMsg.data);
                 con.send(JSON.stringify(messages.HIT_OR_MISS_D));
                 game.playerOne.send(JSON.stringify(messages.ATTACKER));
+            }
+            if (jMsg.data === "I_WON") {
+                game.playerOne.send(JSON.stringify(messages.YOU_LOST));
+                game.playerOne.close();
+                con.close();
             }
         }
     });

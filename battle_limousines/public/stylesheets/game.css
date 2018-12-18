@@ -12,6 +12,18 @@ body {
     background-color: #212121;
 }
 
+#attack {
+    color: white;
+    font-size: 25px;
+    display: none;
+}
+
+#set_tiles, #enemy_ready {
+    color: white;
+    font-size: 25px;
+    display: block;
+}
+
 #garage {
     width: 500px;
     height: 500px;
@@ -62,9 +74,10 @@ body {
     padding: 0px;
     float: left;
     position: relative;
+    display: block;
 }
 
-#start {
+#start, #menu{
     width: 500px;
     height: 125px;
     float: left;
@@ -76,7 +89,11 @@ body {
     display: block;
 }
 
-#start h2:hover{
+#menu {
+    text-align: center;
+}
+
+#start h2:hover, #menu h2:hover{
     color: black;
     cursor: pointer;
     background-color: #595959;

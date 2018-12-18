@@ -1,6 +1,10 @@
 var socket = new WebSocket("ws://localhost:3000");
 var attacker = false;
-var shot = false;
+var coordinate = 0;
+var tiles_set = false;
+var enemy_tiles_set = false;
+var hits = 0;
+var shots = [];
 
 socket.onopen = function(){
     socket.send("{}");
@@ -9,56 +13,89 @@ socket.onopen = function(){
 socket.onmessage = function(event) {
     message = JSON.parse(event.data);
     console.log(message.data);
-    console.log(event.data);
 
     if (message.data === "ATTACK") {
-        console.log("Lol atekker");
         attacker = true;
+        if (tiles_set && enemy_tiles_set) {
+            document.getElementById("attack").style.display = "block";
+        }
     }
 
-    if (message.type == Messages.HIT_OR_MISS && shot) {
+    if (message.data === "ENEMY_TILES_SET") {
+        enemy_tiles_set = true;
+        document.getElementById("enemy_ready").innerHTML = "Enemy is ready!";
+        if (tiles_set && attacker) {
+            document.getElementById("attack").style.display = "block";
+        }
+    }
+
+    if (message.type == Messages.HIT_OR_MISS) {
         if (message.data == "Hit") {
-            console.log("HIT!");
+            hits++;
+            document.getElementById(coordinate).style.backgroundColor = "green";
+
+            document.getElementById("set_tiles").innerHTML = "Enemy tiles left: " + (21-hits);
+            checkEnd();
         } else if (message.data == "Miss") {
-            console.log("Miss...");
+            document.getElementById(coordinate).style.backgroundColor = "red";
         }
     }
 
     if (message.data === "player2") {
-        document.getElementById("overlayText").innerHTML = "Player 1 is ready!";
         socket.send(JSON.stringify(Messages.READY));
-        setTimeout(function () {
-            olOff();
-        }, 2000);
+        olOff("Player 1 is ready!");
     } else if (message.data === "player1") {
-        document.getElementById("overlayText").innerHTML = "Player 2 is ready!";
-        setTimeout(function () {
-            olOff();
-        }, 2000);
+        olOff("Player 2 is ready!");
+    }
+
+    if (message.data === "U_LOST") {
+        document.getElementById("overlayText").innerHTML = "You lost, better luck next time!";
+        document.getElementById("overlay").style.display = "block";
     }
 
 };
 
-function olOff() {
-    document.getElementById("overlay").style.display = "none";
+function checkEnd() {
+    if (hits === 21) {
+        socket.send(JSON.stringify(Messages.I_WON));
+        document.getElementById("overlayText").innerHTML = "You won!";
+        document.getElementById("overlay").style.display = "block";
+    }
+}
+
+function olOff(string) {
+    document.getElementById("overlayText").innerHTML = string;
+    setTimeout(function () {
+        document.getElementById("overlay").style.display = "none";
+    }, 2000);
 }
 
 function main() {
-    for(var i = 1; i <= 64; i++){
-        $("#board").append('<div class="tile '+ i +'"></div>');
-        $("#eBoard").append('<div class="tile '+ i +'"></div>');
+    for (var i = 1; i <= 64; i++) {
+        $("#board").append('<div class="tile"></div>');
+        $("#eBoard").append('<div class="tile" id='+i+'></div>');
     }
 
+    $("#menu").on("click", function menu(){
+        window.location.href = '/';
+    });
+
     $("#eBoard").on("click", function click(event) {
-        if (attacker) {
+        if (attacker && tiles_set && enemy_tiles_set) {
             var boardpos = $("#eBoard").offset();
             var x = Math.ceil((event.pageX - boardpos.left) / 70);
             var y = Math.ceil((event.pageY - boardpos.top) / 70);
             var tile = ((y - 1) * 8) + x;
-            Messages.SHOT_FIRED_LOC.data = tile;
-            socket.send(JSON.stringify(Messages.SHOT_FIRED_LOC));
-            attacker = false;
-            shot = true;
+            coordinate = tile;
+
+            if (!shots.includes(coordinate)) {
+                Messages.SHOT_FIRED_LOC.data = tile;
+                socket.send(JSON.stringify(Messages.SHOT_FIRED_LOC));
+
+                document.getElementById("attack").style.display = "none";
+                attacker = false;
+                shots.push(coordinate);
+            }
         }
     });
 
@@ -72,21 +109,23 @@ function main() {
     }
 
     $("[id^=limousine]").on("click", function click(event){
-        var limo = $("#"+event.target.id);
-        if (limo.parents("#board").length == 1){
-            var width = limo.css("width");
-            limo.css("width", limo.css("height"));
-            limo.css("height", width);
+        if (tiles_set === false) {
+            var limo = $("#" + event.target.id);
+            if (limo.parents("#board").length == 1) {
+                var width = limo.css("width");
+                limo.css("width", limo.css("height"));
+                limo.css("height", width);
 
-            var limopos = limo.offset();
-            var limox = Math.floor((event.pageX - limopos.left)/70)*70;
-            var limoy = Math.floor((event.pageY - limopos.top)/70)*70;
-            var x = limopos.left + limox - limoy;
-            var y = limopos.top + limoy - limox;
-            x = checkleft(x, limo.width());
-            y = checktop(y, limo.height());
-            limo.css("left", x +"px");
-            limo.css("top", y +"px");
+                var limopos = limo.offset();
+                var limox = Math.floor((event.pageX - limopos.left) / 70) * 70;
+                var limoy = Math.floor((event.pageY - limopos.top) / 70) * 70;
+                var x = limopos.left + limox - limoy;
+                var y = limopos.top + limoy - limox;
+                x = checkleft(x, limo.width());
+                y = checktop(y, limo.height());
+                limo.css("left", x + "px");
+                limo.css("top", y + "px");
+            }
         }
     });
 
@@ -124,11 +163,16 @@ function main() {
         Messages.SET_LOCS_D.data = tiles;
         socket.send(JSON.stringify(Messages.SET_LOCS_D));
         //Disabling start button and disabling dragging of the limousines
+        if (enemy_tiles_set && attacker) {
+            document.getElementById("attack").style.display = "block";
+        }
         for (var i = 1; i < 7; i++) {
             document.getElementById("limousine"+i).removeAttribute("draggable");
             document.getElementById("limousine"+i).removeAttribute("ondragstart");
         }
         document.getElementById("start").style.display = "none";
+        document.getElementById("set_tiles").innerHTML = "Enemy tiles left: " + (21-hits);
+        tiles_set = true;
     });
 }
 $(document).ready(main);

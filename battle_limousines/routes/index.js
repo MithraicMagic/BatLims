@@ -5,7 +5,7 @@ var gameStats = require("../stats.js");
 //Getting the homepage
 router.get("/", function(req, res) {
     var path = __dirname + '/../public/splash.ejs';
-    res.render(path, {gamesFinished : gameStats.finished, gamesStarted : gameStats.started});
+    res.render(path, {gamesFinished : gameStats.finished, gamesStarted : gameStats.started_visible});
 });
 
 router.get("/play", function(req, res) {
