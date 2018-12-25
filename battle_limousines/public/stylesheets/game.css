@@ -90,7 +90,8 @@ body {
 }
 
 #menu {
-    text-align: center;
+    width: 100%;
+    display: none;
 }
 
 #start h2:hover, #menu h2:hover{
@@ -119,6 +120,7 @@ body {
     right: 0;
     bottom: 0;
     z-index:2;
+    text-align: center;
     background-color: rgba(0,0,0,0.5);
 }
 

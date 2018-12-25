@@ -6,8 +6,14 @@ var enemy_tiles_set = false;
 var hits = 0;
 var shots = [];
 
-socket.onopen = function(){
+socket.onopen = function() {
     socket.send("{}");
+};
+
+socket.onclose = function() {
+    document.getElementById("overlayText").innerHTML = "Enemy has disconnected.";
+    document.getElementById("menu").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
 };
 
 socket.onmessage = function(event) {
@@ -50,6 +56,7 @@ socket.onmessage = function(event) {
 
     if (message.data === "U_LOST") {
         document.getElementById("overlayText").innerHTML = "You lost, better luck next time!";
+        document.getElementById("menu").style.display = "block";
         document.getElementById("overlay").style.display = "block";
     }
 
@@ -59,6 +66,7 @@ function checkEnd() {
     if (hits === 21) {
         socket.send(JSON.stringify(Messages.I_WON));
         document.getElementById("overlayText").innerHTML = "You won!";
+        document.getElementById("menu").style.display = "block";
         document.getElementById("overlay").style.display = "block";
     }
 }

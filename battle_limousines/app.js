@@ -67,8 +67,7 @@ wss.on("connection", function(ws) {
             }
             if (jMsg.data === "I_WON") {
                 game.playerTwo.send(JSON.stringify(messages.YOU_LOST));
-                game.playerTwo.close();
-                con.close();
+                gameStats.finished++;
             }
         } else {
             if (jMsg.data === "READY") {
@@ -81,11 +80,35 @@ wss.on("connection", function(ws) {
             }
             if (jMsg.data === "I_WON") {
                 game.playerOne.send(JSON.stringify(messages.YOU_LOST));
-                game.playerOne.close();
-                con.close();
+                gameStats.finished++;
             }
         }
     });
+
+    con.on("close", function (code) {
+        console.log(con.id);
+        console.log(code);
+
+        if (code === 1001) {
+            let game = websockets[con.id];
+            gameStats.stopped++;
+
+            try {
+                game.playerOne.close();
+            }
+            catch(e){
+                console.log("Player 1 closing: "+ e);
+            }
+
+            try {
+                game.playerTwo.close();
+            }
+            catch(e){
+                console.log("Player 2 closing: " + e);
+            }
+        }
+    });
+
 });
 
 

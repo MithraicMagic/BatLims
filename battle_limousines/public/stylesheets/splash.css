@@ -1,6 +1,19 @@
-p, h1, h2, h3 {
+p, a, h1, h2, h3 {
+    font-size: 30px;
     text-align: center;
-    color: #4DA4A8;
+    color: white;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+a {
+    border-style: solid;
+    padding: 10px;
+    background-color: dimgrey;
+    border-color: white;
 }
 
 body {
