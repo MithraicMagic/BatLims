@@ -1,8 +1,0 @@
-From Lecture-3.md on GitHub:
-
-	The placement of the <script> tag is an often discussed issue (1000+ upvotes for this question on Stack Overflow alone). In this lecture, we follow the course book argument (page 98):
-
-	"We place the <script> tags in the <body> element: the browser displays the page in a top-down fashion, creating the DOM elements as it comes across them. By placing the <script> tags at the end, the JavaScript files will be one of the last things the page loads. Because JavaScript files often take time to load, we do that last so that the user will get visual feedback from the other elements as fast as possible."
-
-	In other words, interactivity based on the DOM should only start after the DOM has been fully loaded; if you decide to place your script's elsewhere, jQuery's document.ready function is a useful utility.
-
